@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@layout/list_selector"
+    android:padding="5dp"
+    android:layout_margin="1dp">
+
+    <LinearLayout
+        android:id="@+id/thumbnail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="5dp">
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/file_name"
+        android:textSize="15sp"
+        android:textColor="#000000"
+        android:text="文件"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="2dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/size" />
+
+    <TextView
+        android:id="@+id/size"
+        android:text="文件夹"
+        android:textSize="14sp"
+
+        android:padding="2dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/thumbnail"
+        android:layout_alignBottom="@id/thumbnail" />
+
+    <TextView
+        android:id="@+id/time"
+        android:text="123990"
+        android:textSize="14sp"
+
+        android:padding="2dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/size"
+        android:layout_alignParentRight="true"/>
+
+    <!--<ImageView-->
+        <!--android:src="@drawable/menu"-->
+        <!--android:layout_width="30dp"-->
+        <!--android:layout_height="30dp"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:id="@+id/imageView" />-->
+</RelativeLayout>
