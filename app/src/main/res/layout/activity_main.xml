@@ -1,14 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="cn.wjinlong.filemanager.MainActivity">
+    tools:context="cn.wjinlong.filemanager.activities.MainActivity">
 
+    <LinearLayout
+        android:id="@+id/file_operate"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone"
+        >
+            <ImageButton
+                android:scaleType="fitCenter"
+                android:id="@+id/file_copy"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/copy"
+                android:background="#00ffffff"
+                android:layout_weight="1"
+                android:onClick="fileCopy"
+                />
+            <ImageButton
+                android:scaleType="fitCenter"
+                android:id="@+id/file_move"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/move"
+                android:background="#00ffffff"
+                android:layout_weight="1"
+                android:onClick="fileMove"
+                />
+            <ImageButton
+                android:scaleType="fitCenter"
+                android:id="@+id/file_delete"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/delete"
+                android:background="#00ffffff"
+                android:layout_weight="1"
+                android:onClick="fileDelete"
+                />
+            <ImageButton
+                android:scaleType="fitCenter"
+                android:id="@+id/file_rename"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/rename"
+                android:background="#00ffffff"
+                android:padding="0dp"
+                android:layout_weight="1"
+                android:onClick="fileRename"
+                />
+            <ImageButton
+                android:scaleType="fitCenter"
+                android:id="@+id/file_share"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/share"
+                android:background="#00ffffff"
+                android:layout_weight="1"
+                android:onClick="fileShare"
+                />
+            <ImageButton
+                android:scaleType="fitCenter"
+                android:id="@+id/file_more"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/more2"
+                android:background="#00ffffff"
+                android:layout_weight="1"
+                android:onClick="fileMore"
+                />
+        </LinearLayout>
     <ListView
         android:id="@+id/list_item"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_above="@id/file_operate"
+        />
 
-</LinearLayout>
+
+
+</RelativeLayout>

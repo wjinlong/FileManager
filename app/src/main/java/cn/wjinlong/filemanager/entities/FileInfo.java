@@ -1,4 +1,4 @@
-package cn.wjinlong.filemanager.entity;
+package cn.wjinlong.filemanager.entities;
 
 import android.media.Image;
 
