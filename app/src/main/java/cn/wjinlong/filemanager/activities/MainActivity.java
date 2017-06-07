@@ -1,8 +1,10 @@
 package cn.wjinlong.filemanager.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +20,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 import cn.wjinlong.filemanager.R;
@@ -168,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 对文件列表进行排序（以文件名）
-     * @param fileList
+     * @param fileList 文件列表
      */
     private void sortFileList(List<File> fileList) {
         Collections.sort(fileList, new Comparator<File>() {
@@ -186,9 +189,9 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 双击退出
-     * @param keyCode
-     * @param event
-     * @return
+     * @param keyCode   按键码
+     * @param event     事件
+     * @return          是否处理完成
      */
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
@@ -224,14 +227,14 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyUp(keyCode, event);
     }
 
-    public void getCheckedFiles(){
+    public void refreshCheckedFiles(){
 
         printItemsStates();
 
         SparseBooleanArray checkedItemPositions = listView.getCheckedItemPositions();
-        //Log.i("getCheckedFiles", String.valueOf(checkedItemPositions));
+        //Log.i("refreshCheckedFiles", String.valueOf(checkedItemPositions));
         for (int i = 0; i < checkedItemPositions.size(); i++) {
-            //Log.i("getCheckedFiles", String.valueOf(checkedItemPositions.get(i)));
+            //Log.i("refreshCheckedFiles", String.valueOf(checkedItemPositions.get(i)));
             int key = checkedItemPositions.keyAt(i);
             if (checkedItemPositions.get(key)) {
                 checkedFiles.add(fileList.get(key));
@@ -249,14 +252,48 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void fileDelete(View view){
-        getCheckedFiles();
-        Log.i(TAG,"fileDelete");
-        for (File tmp : checkedFiles) {
-            tmp.delete();
-            Log.i(TAG,tmp.getPath());
-        }
-        listView.clearChoices();
-        refreshFileList();
+        AlertDialog.Builder deleteDialog = new AlertDialog.Builder(this);
+        deleteDialog.setTitle("删除");
+        deleteDialog.setMessage("确认删除所选文件？");
+        deleteDialog.setCancelable(false);
+        deleteDialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                refreshCheckedFiles();//刷新选中文件列表
+                LinkedList<File> files = new LinkedList<>();
+
+                for (File file : checkedFiles) {
+                    files.push(file);
+                }
+
+                while (!files.isEmpty()) {
+                    File file = files.pop();
+                    if (file.exists() && file.isFile()) {
+                        file.delete();
+                    }else if (file.exists() && file.isDirectory()){
+                        File[] listFiles = file.listFiles();
+                        if (listFiles.length == 0) {
+                            file.delete();
+                        } else {
+                            files.add(file);
+                            for (File tmp : listFiles) {
+                                files.push(tmp);
+                            }
+                        }
+                    }
+                }
+                exitMultiSelectMode();
+                refreshFileList();
+                Toast.makeText(MainActivity.this, "删除成功！", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        deleteDialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        deleteDialog.show();
     }
 
     public void fileRename(View view){
