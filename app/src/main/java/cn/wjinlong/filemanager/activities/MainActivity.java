@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AbsListView;
@@ -35,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     private long firstBackTime=0;
 
     boolean isChooseMod = false;
+
+    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,11 +73,14 @@ public class MainActivity extends AppCompatActivity {
                         refreshFileList();
                     }
                 }else {
-                    if (listView.isItemChecked(i)){
+                    if (!listView.isItemChecked(i)){
                         listView.setItemChecked(i,false);
+                        Log.i(TAG,"取消");
                     }else {
                         listView.setItemChecked(i,true);
+                        Log.i(TAG,"选中");
                     }
+                   // listView.setItemChecked(i,true);
                     fileAdapter.notifyDataSetChanged();
                 }
             }
