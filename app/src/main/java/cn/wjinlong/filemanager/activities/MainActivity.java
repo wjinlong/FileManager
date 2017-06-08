@@ -10,9 +10,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -297,7 +299,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void fileRename(View view){
+        refreshCheckedFiles();
+        if (listView.getCheckedItemCount() == 1) {
 
+            AlertDialog.Builder renameDialog = new AlertDialog.Builder(this);
+            renameDialog.setTitle("重命名");
+
+            LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
+            View renameView =inflater.inflate(R.layout.rename_dialog, null);
+            renameDialog.setView(renameView);
+
+            renameDialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    File oldFile = checkedFiles.get(0);
+
+                    EditText newName = (EditText) findViewById(R.id.new_name);
+                    newName.setText(oldFile.getName());
+
+                    String newPath = oldFile.getParent()+File.separator+newName.getText();
+                    File newFile = new File(newPath);
+                    oldFile.renameTo(newFile);
+                }
+            });
+            renameDialog.show();
+        }
     }
     public void fileShare(View view){
 
