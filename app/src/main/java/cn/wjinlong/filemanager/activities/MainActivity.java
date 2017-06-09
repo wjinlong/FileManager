@@ -7,10 +7,15 @@ import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.util.SparseBooleanArray;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -361,6 +366,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void fileMore(View view){
+        //创建弹出式菜单
+        PopupMenu popupMenu = new PopupMenu(this, view);
+        //填充菜单
+        popupMenu.inflate(R.menu.file_more);
 
+        popupMenu.setGravity(Gravity.TOP);
+
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.file_details:
+                        Toast.makeText(MainActivity.this, "属性", Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            }
+        });
+        //显示
+        popupMenu.show();
     }
 }

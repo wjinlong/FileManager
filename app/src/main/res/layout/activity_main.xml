@@ -75,7 +75,10 @@
                 android:layout_weight="1"
                 android:onClick="fileMore"
                 />
+
         </LinearLayout>
+
+
     <ListView
         android:id="@+id/list_item"
         android:layout_width="match_parent"
