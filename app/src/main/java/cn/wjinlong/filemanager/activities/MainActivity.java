@@ -233,6 +233,7 @@ public class MainActivity extends AppCompatActivity {
 
         printItemsStates();
 
+        checkedFiles.clear();
         SparseBooleanArray checkedItemPositions = listView.getCheckedItemPositions();
         //Log.i("refreshCheckedFiles", String.valueOf(checkedItemPositions));
         for (int i = 0; i < checkedItemPositions.size(); i++) {
@@ -300,31 +301,56 @@ public class MainActivity extends AppCompatActivity {
 
     public void fileRename(View view){
         refreshCheckedFiles();
-        if (listView.getCheckedItemCount() == 1) {
 
-            AlertDialog.Builder renameDialog = new AlertDialog.Builder(this);
+        if (listView.getCheckedItemCount() == 1) {
+            final AlertDialog.Builder renameDialog = new AlertDialog.Builder(this);
             renameDialog.setTitle("重命名");
 
             LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
-            View renameView =inflater.inflate(R.layout.rename_dialog, null);
+            final View renameView =inflater.inflate(R.layout.rename_dialog, null);
             renameDialog.setView(renameView);
+
+            final EditText newName = (EditText) renameView.findViewById(R.id.new_name);
+            final File oldFile = checkedFiles.get(0);
+
+            newName.setText(oldFile.getName());
+            newName.setSelectAllOnFocus(true);
+
 
             renameDialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    File oldFile = checkedFiles.get(0);
+                    String newPath;
+                    if (oldFile.isFile()) {
+                        newPath = oldFile.getParent() + File.separator + newName.getText().toString();
+                    } else {
+                        newPath = oldFile.getParent() + File.separator + newName.getText().toString() + File.separator;
+                    }
 
-                    EditText newName = (EditText) findViewById(R.id.new_name);
-                    newName.setText(oldFile.getName());
+//                    Log.d("path", "old file parent"+oldFile.getParent());
+//                    Log.d("path", "new path"+newPath);
 
-                    String newPath = oldFile.getParent()+File.separator+newName.getText();
                     File newFile = new File(newPath);
                     oldFile.renameTo(newFile);
+
+                    exitMultiSelectMode();
+                    refreshFileList();
+
                 }
             });
-            renameDialog.show();
+
+            renameDialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    exitMultiSelectMode();
+                }
+            });
+
+            renameDialog.show();//要在setButton之后，不然没有按钮。
         }
     }
+
+
     public void fileShare(View view){
 
     }

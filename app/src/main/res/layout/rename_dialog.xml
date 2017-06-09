@@ -3,6 +3,8 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
     <EditText
+        android:layout_marginRight="25dp"
+        android:layout_marginLeft="25dp"
         android:id="@+id/new_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
