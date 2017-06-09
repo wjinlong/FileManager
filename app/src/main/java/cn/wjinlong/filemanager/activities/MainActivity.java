@@ -331,11 +331,16 @@ public class MainActivity extends AppCompatActivity {
 //                    Log.d("path", "new path"+newPath);
 
                     File newFile = new File(newPath);
-                    oldFile.renameTo(newFile);
+
+                    boolean renameResult = oldFile.renameTo(newFile);
+                    if (renameResult) {
+                        Toast.makeText(MainActivity.this, "重命名成功", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "重命名失败", Toast.LENGTH_SHORT).show();
+                    }
 
                     exitMultiSelectMode();
                     refreshFileList();
-
                 }
             });
 
