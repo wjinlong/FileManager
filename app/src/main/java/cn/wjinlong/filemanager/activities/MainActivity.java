@@ -253,11 +253,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void fileCopy(View view){
-
     }
 
-    public void fileMove(View view){
-
+    public void fileMove(View view) {
     }
 
     public void fileDelete(View view){

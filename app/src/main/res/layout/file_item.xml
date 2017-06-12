@@ -10,18 +10,19 @@
     <LinearLayout
         android:id="@+id/thumbnail"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginRight="5dp">
         <ImageView
             android:id="@+id/icon"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
             />
     </LinearLayout>
 
     <TextView
         android:id="@+id/file_name"
-        android:textSize="15sp"
+        android:textSize="12sp"
         android:textColor="#000000"
         android:text="文件"
 
@@ -34,7 +35,7 @@
     <TextView
         android:id="@+id/size"
         android:text="文件夹"
-        android:textSize="14sp"
+        android:textSize="10sp"
 
         android:padding="2dp"
         android:layout_width="wrap_content"
@@ -45,7 +46,7 @@
     <TextView
         android:id="@+id/time"
         android:text="123990"
-        android:textSize="14sp"
+        android:textSize="10sp"
 
         android:padding="2dp"
         android:layout_width="wrap_content"
