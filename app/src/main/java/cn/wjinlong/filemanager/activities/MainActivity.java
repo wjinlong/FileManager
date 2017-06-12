@@ -21,6 +21,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -362,7 +363,17 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void fileShare(View view){
-
+        refreshCheckedFiles();
+        if (listView.getCheckedItemCount() == 1) {
+            File file = checkedFiles.get(0);
+            if (file.isFile()) {
+                Uri path = Uri.fromFile(file);
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setDataAndType(path, "*/*");
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }
+        }
     }
 
     public void fileMore(View view){
@@ -379,6 +390,43 @@ public class MainActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
                     case R.id.file_details:
                         Toast.makeText(MainActivity.this, "属性", Toast.LENGTH_SHORT).show();
+                        AlertDialog.Builder detailsDialog = new AlertDialog.Builder(MainActivity.this);
+                        detailsDialog.setTitle("属性");
+
+                        LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
+                        final View detailsView =inflater.inflate(R.layout.details_dialog, null);
+                        detailsDialog.setView(detailsView);
+
+                        refreshCheckedFiles();
+                        int totals=0;
+                        int folders=0;
+                        int files=0;
+                        String path="";
+                        int totalSize=0;
+
+                        for (File file : checkedFiles) {
+                            if (file.isFile()) {
+                                ++files;
+                            } else {
+                                ++folders;
+                            }
+                            ++totals;
+                        }
+
+
+
+
+
+                        TextView totalsView = (TextView) detailsView.findViewById(R.id.totals);
+                        TextView foldersView = (TextView) detailsView.findViewById(R.id.folders);
+                        TextView filesView = (TextView) detailsView.findViewById(R.id.files);
+                        TextView pathView = (TextView) detailsView.findViewById(R.id.path);
+                        TextView totaSizeView = (TextView) detailsView.findViewById(R.id.total_size);
+
+
+
+                        detailsDialog.setPositiveButton("确定",null);
+                        detailsDialog.show();
                         break;
                     default:
                         break;

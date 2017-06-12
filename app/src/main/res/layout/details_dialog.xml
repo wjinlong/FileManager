@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:padding="20dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:paddingRight="10dp"
+            android:textAlignment="textEnd"
+            android:text="总计:"/>
+        <TextView
+            android:id="@+id/totals"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:textSize="15sp"
+            android:textAlignment="textStart"
+            android:text="123456"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:paddingRight="10dp"
+            android:textAlignment="textEnd"
+            android:text="文件夹:"/>
+
+        <TextView
+            android:id="@+id/folders"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:textSize="15sp"
+            android:textAlignment="textStart"
+            android:text="12346"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:paddingRight="10dp"
+            android:textAlignment="textEnd"
+            android:text="文件:"/>
+
+        <TextView
+            android:id="@+id/files"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:textSize="15sp"
+            android:textAlignment="textStart"
+            android:text="123456"/>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:paddingRight="10dp"
+            android:textAlignment="textEnd"
+            android:text="位置:"/>
+        <TextView
+            android:id="@+id/path"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:textSize="15sp"
+            android:textAlignment="textStart"
+            android:text="123456"/>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:paddingRight="10dp"
+            android:textAlignment="textEnd"
+            android:text="大小:"/>
+
+        <TextView
+            android:id="@+id/total_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:textSize="15sp"
+            android:textAlignment="textStart"
+            android:text="12345645"/>
+    </LinearLayout>
+</LinearLayout>
