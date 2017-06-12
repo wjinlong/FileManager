@@ -25,6 +25,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -45,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
     List<File> fileList;//文件列表
     String rootPath = Environment.getExternalStorageDirectory().getPath();//根目录
     String currentPath = rootPath;
+
+    String toPath;
+
 
     List<File> checkedFiles = new ArrayList<>();//选中的文件列表
     FileAdapter fileAdapter;//文件适配器
@@ -253,6 +262,39 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void fileCopy(View view){
+        Intent intent = new Intent(MainActivity.this,ChoosePathActivity.class);
+        startActivityForResult(intent,1);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case 1:
+                if (resultCode == RESULT_OK) {
+                    toPath = data.getStringExtra("path");
+                    Log.d("返回的路径", toPath);
+
+                    for (File file : checkedFiles) {
+                        if (file.isFile()){
+                            File copy = new File(toPath+File.separator+file.getName());
+
+                            InputStream is;
+                            OutputStream os;
+                            try {
+                                is = new FileInputStream(file);
+                                os = new FileOutputStream(copy);
+
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }
+                }
+                break;
+            default:
+        }
     }
 
     public void fileMove(View view) {

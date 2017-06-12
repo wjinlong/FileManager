@@ -10,8 +10,10 @@
     <LinearLayout
         android:id="@+id/thumbnail"
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:layout_marginRight="5dp">
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:layout_marginRight="5dp"
+        android:gravity="center_vertical">
         <ImageView
             android:id="@+id/icon"
             android:layout_width="30dp"
@@ -30,7 +32,7 @@
         android:layout_height="wrap_content"
         android:padding="2dp"
         android:layout_alignParentTop="true"
-        android:layout_alignStart="@+id/size" />
+        android:layout_toRightOf="@id/thumbnail" />
 
     <TextView
         android:id="@+id/size"
@@ -41,7 +43,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/thumbnail"
-        android:layout_alignBottom="@id/thumbnail" />
+        android:layout_below="@id/file_name"/>
 
     <TextView
         android:id="@+id/time"

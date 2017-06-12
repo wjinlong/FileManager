@@ -1,5 +1,6 @@
 package cn.wjinlong.filemanager.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
@@ -101,8 +102,12 @@ public class FileAdapter extends BaseAdapter {
 
     public void updateBackground(int i, View view) {
         int backgroundID;
-        MainActivity mainActivity = (MainActivity) context;
-        ListView listView = mainActivity.listView;
+        ListView listView = null;
+        if (context instanceof MainActivity){
+            listView = ((MainActivity) context).listView;
+        } else if (context instanceof ChoosePathActivity) {
+            listView = ((ChoosePathActivity) context).listView;
+        }
 
         if (listView.isItemChecked(i)){
             backgroundID = R.drawable.gradient_bg_hover;

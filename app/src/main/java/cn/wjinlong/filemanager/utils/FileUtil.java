@@ -108,6 +108,21 @@ public class FileUtil {
         return fileList;
     }
 
+    public List<File> getFileList(int a) {//只返回文件夹
+        File file = new File(path);
+        fileList = new ArrayList<>();
+        if (file.exists() && file.isDirectory()){
+            String[] files = file.list();
+            for (String i : files) {
+                File tmp = new File(path+File.separator+i);
+                if (tmp.exists()&& tmp.isDirectory()){
+                    fileList.add(tmp);
+                }
+            }
+        }
+        return fileList;
+    }
+
     public void setPath(String path) {
         this.path = path;
     }
