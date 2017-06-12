@@ -394,36 +394,40 @@ public class MainActivity extends AppCompatActivity {
                         detailsDialog.setTitle("属性");
 
                         LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
-                        final View detailsView =inflater.inflate(R.layout.details_dialog, null);
+                        View detailsView =inflater.inflate(R.layout.details_dialog, null);
                         detailsDialog.setView(detailsView);
 
                         refreshCheckedFiles();
                         int totals=0;
                         int folders=0;
                         int files=0;
-                        String path="";
-                        int totalSize=0;
+                        String path=checkedFiles.get(0).getParent().toString();
+                        long totalSize=0;
 
                         for (File file : checkedFiles) {
                             if (file.isFile()) {
                                 ++files;
+                                totalSize+=file.length();
                             } else {
                                 ++folders;
+                                totalSize+=file.length();
                             }
                             ++totals;
                         }
-
-
-
-
 
                         TextView totalsView = (TextView) detailsView.findViewById(R.id.totals);
                         TextView foldersView = (TextView) detailsView.findViewById(R.id.folders);
                         TextView filesView = (TextView) detailsView.findViewById(R.id.files);
                         TextView pathView = (TextView) detailsView.findViewById(R.id.path);
-                        TextView totaSizeView = (TextView) detailsView.findViewById(R.id.total_size);
+                        TextView totalSizeView = (TextView) detailsView.findViewById(R.id.total_size);
 
+                        totalsView.setText(String.valueOf(totals));
+                        foldersView.setText(String.valueOf(folders));
+                        filesView.setText(String.valueOf(files));
+                        pathView.setText(path);
 
+                        FileAdapter adapter = new FileAdapter();
+                        totalSizeView.setText(adapter.fileSize(totalSize));
 
                         detailsDialog.setPositiveButton("确定",null);
                         detailsDialog.show();

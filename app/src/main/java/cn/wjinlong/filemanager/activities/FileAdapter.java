@@ -27,6 +27,9 @@ public class FileAdapter extends BaseAdapter {
     Context context;
     List<File> list;
 
+    public FileAdapter() {
+    }
+
     public FileAdapter(Context context, List<File> list) {
         this.context = context;
         this.list = list;
@@ -110,7 +113,7 @@ public class FileAdapter extends BaseAdapter {
         view.setBackground(background);
     }
 
-    private String fileSize(long fileLength) {
+    public String fileSize(long fileLength) {
         int level=1;
         String unit;
 
@@ -125,13 +128,13 @@ public class FileAdapter extends BaseAdapter {
                 unit = "B";
                 break;
             case 2:
-                unit ="M";
+                unit ="K";
                 break;
             case 3:
-                unit = "G";
+                unit = "M";
                 break;
             case 4:
-                unit = "P";
+                unit = "G";
                 break;
             default:
                 unit = "B";
