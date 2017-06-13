@@ -3,18 +3,16 @@ package cn.wjinlong.filemanager.activities;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
@@ -26,16 +24,15 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import cn.wjinlong.filemanager.R;
 import cn.wjinlong.filemanager.utils.FileUtil;
@@ -45,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int MODE_NORMAL = 0;
     public static final int MODE_MULTISELECT = 1;
 
-    private static int MODE=MODE_NORMAL;//运行模式
+    private static int MODE = MODE_NORMAL;//运行模式
 
     ListView listView;
     List<File> fileList;//文件列表
@@ -57,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
     List<File> checkedFiles = new ArrayList<>();//选中的文件列表
     FileAdapter fileAdapter;//文件适配器
-    private long firstBackTime=0;//第一次按back键的时间，为了实现双击back退出
+    private long firstBackTime = 0;//第一次按back键的时间，为了实现双击back退出
 
     private static final String TAG = "MainActivity";
 
@@ -66,14 +63,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        listView= (ListView) findViewById(R.id.list_item);
+        listView = (ListView) findViewById(R.id.list_item);
 
         refreshFileList();//刷新文件列表
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                switch (MODE){
+                switch (MODE) {
                     case MODE_NORMAL:
                         clickInNormalMode(i);
                         break;
@@ -101,14 +98,14 @@ public class MainActivity extends AppCompatActivity {
         listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);//设置listView为多选模式
         MODE = MODE_MULTISELECT;//修改运行模式
         //printItemsStates();
-        listView.setItemChecked(i,true);//设置选择的那个item为选中
+        listView.setItemChecked(i, true);//设置选择的那个item为选中
         //printItemsStates();
     }
 
     private void printItemsStates() {
-        Log.i(TAG,"被选中的数量："+listView.getCheckedItemCount());
-        for (int j = 0; j < listView.getCount(); j++){
-            Log.i(TAG,"item["+j+"]:"+listView.isItemChecked(j));
+        Log.i(TAG, "被选中的数量：" + listView.getCheckedItemCount());
+        for (int j = 0; j < listView.getCount(); j++) {
+            Log.i(TAG, "item[" + j + "]:" + listView.isItemChecked(j));
         }
     }
 
@@ -121,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void clickInMultiSelectMode() {
-        if (listView.getCheckedItemCount()==0){
+        if (listView.getCheckedItemCount() == 0) {
             exitMultiSelectMode();
         }
         fileAdapter.notifyDataSetChanged();
@@ -150,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void clickInNormalMode(int i) {
         File file = fileList.get(i);
-        if (file.exists()){//如果文件存在
+        if (file.exists()) {//如果文件存在
             if (file.isDirectory()) {//如果是目录文件
                 currentPath = currentPath + File.separator + file.getName();//生成新的路径，相对于进入该文件夹
                 refreshFileList();//刷新文件列表
@@ -164,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
             }
-        }else {//如果文件不存在
+        } else {//如果文件不存在
             Toast.makeText(MainActivity.this, "文件夹或文件不存在或已被删除", Toast.LENGTH_SHORT).show();
             refreshFileList();
         }
@@ -188,15 +185,16 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 对文件列表进行排序（以文件名）
+     *
      * @param fileList 文件列表
      */
     private void sortFileList(List<File> fileList) {
         Collections.sort(fileList, new Comparator<File>() {
             @Override
             public int compare(File file1, File file2) {
-                if (file1.isDirectory() && file2.isDirectory() || file1.isFile() && file2.isFile()){
+                if (file1.isDirectory() && file2.isDirectory() || file1.isFile() && file2.isFile()) {
                     return file1.compareTo(file2);
-                }else {
+                } else {
                     //文件夹显示在文件之前；
                     return file1.isDirectory() ? -1 : 1;
                 }
@@ -206,27 +204,28 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 双击退出
-     * @param keyCode   按键码
-     * @param event     事件
-     * @return          是否处理完成
+     *
+     * @param keyCode 按键码
+     * @param event   事件
+     * @return 是否处理完成
      */
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        switch (MODE){
+        switch (MODE) {
             case MODE_NORMAL:
-                switch (keyCode){
+                switch (keyCode) {
                     case KeyEvent.KEYCODE_BACK:
-                        if (currentPath.equals(rootPath)){
+                        if (currentPath.equals(rootPath)) {
                             long secondBackTime = System.currentTimeMillis();
                             if (secondBackTime - firstBackTime > 2000) {
-                                Toast.makeText(MainActivity.this, "再按一次退出程序",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MainActivity.this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
                                 firstBackTime = secondBackTime;
                                 return true;
-                            }else {
+                            } else {
                                 return super.onKeyUp(keyCode, event);
                                 //System.exit(0);
                             }
-                        }else {
+                        } else {
                             currentPath = currentPath.substring(0, currentPath.lastIndexOf(File.separator));
                             refreshFileList();
                             return true;
@@ -244,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyUp(keyCode, event);
     }
 
-    public void refreshCheckedFiles(){
+    public void refreshCheckedFiles() {
 
         printItemsStates();
 
@@ -261,9 +260,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void fileCopy(View view){
-        Intent intent = new Intent(MainActivity.this,ChoosePathActivity.class);
-        startActivityForResult(intent,1);
+    public void fileCopy(View view) {
+        Intent intent = new Intent(MainActivity.this, ChoosePathActivity.class);
+        startActivityForResult(intent, 1);
 
     }
 
@@ -274,23 +273,34 @@ public class MainActivity extends AppCompatActivity {
                 if (resultCode == RESULT_OK) {
                     toPath = data.getStringExtra("path");
                     Log.d("返回的路径", toPath);
+                    File dstDir = new File(toPath);
 
+                    refreshCheckedFiles();
                     for (File file : checkedFiles) {
-                        if (file.isFile()){
-                            File copy = new File(toPath+File.separator+file.getName());
-
-                            InputStream is;
-                            OutputStream os;
-                            try {
-                                is = new FileInputStream(file);
-                                os = new FileOutputStream(copy);
-
-                            } catch (FileNotFoundException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
+                        Log.d("复制文件", file.getName());
+                        FileUtil.copy(file, dstDir);
                     }
+                    currentPath = toPath;
+                    exitMultiSelectMode();
+                    refreshFileList();
+                    Toast.makeText(MainActivity.this, "复制成功", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case 2:
+                if (resultCode == RESULT_OK) {
+                    toPath = data.getStringExtra("path");
+                    Log.d("返回的路径", toPath);
+                    File dstDir = new File(toPath);
+
+                    refreshCheckedFiles();
+                    for (File file : checkedFiles) {
+                        Log.d("移动文件", file.getName());
+                        FileUtil.move(file, dstDir);
+                    }
+                    currentPath = toPath;
+                    exitMultiSelectMode();
+                    refreshFileList();
+                    Toast.makeText(MainActivity.this, "移动成功", Toast.LENGTH_SHORT).show();
                 }
                 break;
             default:
@@ -298,9 +308,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void fileMove(View view) {
+        Intent intent = new Intent(MainActivity.this, ChoosePathActivity.class);
+        startActivityForResult(intent, 2);
     }
 
-    public void fileDelete(View view){
+    public void fileDelete(View view) {
         AlertDialog.Builder deleteDialog = new AlertDialog.Builder(this);
         deleteDialog.setTitle("删除");
         deleteDialog.setMessage("确认删除所选文件？");
@@ -309,28 +321,33 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 refreshCheckedFiles();//刷新选中文件列表
-                LinkedList<File> files = new LinkedList<>();
 
                 for (File file : checkedFiles) {
-                    files.push(file);
+                    Log.d("删除文件", file.getName());
+                    FileUtil.delete(file);
                 }
-
-                while (!files.isEmpty()) {
-                    File file = files.pop();
-                    if (file.exists() && file.isFile()) {
-                        file.delete();
-                    }else if (file.exists() && file.isDirectory()){
-                        File[] listFiles = file.listFiles();
-                        if (listFiles.length == 0) {
-                            file.delete();
-                        } else {
-                            files.add(file);
-                            for (File tmp : listFiles) {
-                                files.push(tmp);
-                            }
-                        }
-                    }
-                }
+//                LinkedList<File> files = new LinkedList<>();
+//
+//                for (File file : checkedFiles) {
+//                    files.push(file);
+//                }
+//
+//                while (!files.isEmpty()) {
+//                    File file = files.pop();
+//                    if (file.exists() && file.isFile()) {
+//                        file.delete();
+//                    }else if (file.exists() && file.isDirectory()){
+//                        File[] listFiles = file.listFiles();
+//                        if (listFiles.length == 0) {
+//                            file.delete();
+//                        } else {
+//                            files.add(file);
+//                            for (File tmp : listFiles) {
+//                                files.push(tmp);
+//                            }
+//                        }
+//                    }
+//                }
                 exitMultiSelectMode();
                 refreshFileList();
                 Toast.makeText(MainActivity.this, "删除成功！", Toast.LENGTH_SHORT).show();
@@ -345,7 +362,7 @@ public class MainActivity extends AppCompatActivity {
         deleteDialog.show();
     }
 
-    public void fileRename(View view){
+    public void fileRename(View view) {
         refreshCheckedFiles();
 
         if (listView.getCheckedItemCount() == 1) {
@@ -353,7 +370,7 @@ public class MainActivity extends AppCompatActivity {
             renameDialog.setTitle("重命名");
 
             LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
-            final View renameView =inflater.inflate(R.layout.rename_dialog, null);
+            final View renameView = inflater.inflate(R.layout.rename_dialog, null);
             renameDialog.setView(renameView);
 
             final EditText newName = (EditText) renameView.findViewById(R.id.new_name);
@@ -402,7 +419,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void fileShare(View view){
+    public void fileShare(View view) {
         refreshCheckedFiles();
         if (listView.getCheckedItemCount() == 1) {
             File file = checkedFiles.get(0);
@@ -416,7 +433,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void fileMore(View view){
+    public void fileMore(View view) {
         //创建弹出式菜单
         PopupMenu popupMenu = new PopupMenu(this, view);
         //填充菜单
@@ -434,23 +451,23 @@ public class MainActivity extends AppCompatActivity {
                         detailsDialog.setTitle("属性");
 
                         LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
-                        View detailsView =inflater.inflate(R.layout.details_dialog, null);
+                        View detailsView = inflater.inflate(R.layout.details_dialog, null);
                         detailsDialog.setView(detailsView);
 
                         refreshCheckedFiles();
-                        int totals=0;
-                        int folders=0;
-                        int files=0;
-                        String path=checkedFiles.get(0).getParent().toString();
-                        long totalSize=0;
+                        int totals = 0;
+                        int folders = 0;
+                        int files = 0;
+                        String path = checkedFiles.get(0).getParent().toString();
+                        long totalSize = 0;
 
                         for (File file : checkedFiles) {
                             if (file.isFile()) {
                                 ++files;
-                                totalSize+=file.length();
+                                totalSize += file.length();
                             } else {
                                 ++folders;
-                                totalSize+=file.length();
+                                totalSize += file.length();
                             }
                             ++totals;
                         }
@@ -469,7 +486,7 @@ public class MainActivity extends AppCompatActivity {
                         FileAdapter adapter = new FileAdapter();
                         totalSizeView.setText(adapter.fileSize(totalSize));
 
-                        detailsDialog.setPositiveButton("确定",null);
+                        detailsDialog.setPositiveButton("确定", null);
                         detailsDialog.show();
                         break;
                     default:
