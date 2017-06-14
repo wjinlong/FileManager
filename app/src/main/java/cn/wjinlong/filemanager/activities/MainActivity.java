@@ -13,6 +13,8 @@ import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
@@ -23,26 +25,28 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import cn.wjinlong.filemanager.R;
 import cn.wjinlong.filemanager.utils.FileUtil;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int MODE_NORMAL = 0;
-    public static final int MODE_MULTISELECT = 1;
+    public static final int NORMAL_MODE = 0;
+    public static final int MULTI_SELECT_MODE = 1;
+    private static int MODE = NORMAL_MODE;//运行模式
 
-    private static int MODE = MODE_NORMAL;//运行模式
+    public static final int SORT_BY_NAME = 0;
+    public static final int SORT_BY_TIME = 1;
+    private static int SORT_BY = SORT_BY_TIME;
+
+    public static final int ORDER = 1;
+    public static final int REVERSE_ORDER = -1;
+    private static int SORT_ORDER = REVERSE_ORDER;
+
 
     ListView listView;
     List<File> fileList;//文件列表
@@ -71,10 +75,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 switch (MODE) {
-                    case MODE_NORMAL:
+                    case NORMAL_MODE:
                         clickInNormalMode(i);
                         break;
-                    case MODE_MULTISELECT:
+                    case MULTI_SELECT_MODE:
                         clickInMultiSelectMode();
                         break;
                     default:
@@ -92,16 +96,50 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.sort_options,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.sort_by_name:
+                SORT_BY = SORT_BY_NAME;
+                SORT_ORDER = ORDER;
+                refreshFileList();
+                return true;
+            case R.id.sort_by_time:
+                SORT_BY = SORT_BY_TIME;
+                SORT_ORDER = REVERSE_ORDER;
+                refreshFileList();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /**
+     * 进入多选模式
+     *
+     * @param i 进入多选模式时点击的Item的编号
+     */
     private void enterMultiSelectMode(int i) {
         View operate = findViewById(R.id.file_operate);//得到文件操作菜单
         operate.setVisibility(View.VISIBLE);//设置文件操作菜单可见
         listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);//设置listView为多选模式
-        MODE = MODE_MULTISELECT;//修改运行模式
+        MODE = MULTI_SELECT_MODE;//修改运行模式
         //printItemsStates();
         listView.setItemChecked(i, true);//设置选择的那个item为选中
         //printItemsStates();
     }
 
+    /**
+     * 打印所有Item的信息，调试使用
+     */
     private void printItemsStates() {
         Log.i(TAG, "被选中的数量：" + listView.getCheckedItemCount());
         for (int j = 0; j < listView.getCount(); j++) {
@@ -109,14 +147,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 退出多选模式
+     */
     private void exitMultiSelectMode() {
         listView.clearChoices();
         listView.setChoiceMode(AbsListView.CHOICE_MODE_NONE);
         View operate = findViewById(R.id.file_operate);
         operate.setVisibility(View.GONE);
-        MODE = MODE_NORMAL;
+        MODE = NORMAL_MODE;
     }
 
+    /**
+     * 多选模式下的点击事件
+     */
     private void clickInMultiSelectMode() {
         if (listView.getCheckedItemCount() == 0) {
             exitMultiSelectMode();
@@ -145,6 +189,11 @@ public class MainActivity extends AppCompatActivity {
         }*/
     }
 
+    /**
+     * 正常模式下的点击事件
+     *
+     * @param i 点击的Item的编号
+     */
     private void clickInNormalMode(int i) {
         File file = fileList.get(i);
         if (file.exists()) {//如果文件存在
@@ -167,7 +216,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    /**
+     * 刷新文件列表
+     */
     private void refreshFileList() {
         FileUtil fileUtil = new FileUtil(currentPath);
         fileList = fileUtil.getFileList();
@@ -184,22 +235,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 对文件列表进行排序（以文件名）
+     * 对文件列表进行排序
      *
      * @param fileList 文件列表
      */
     private void sortFileList(List<File> fileList) {
-        Collections.sort(fileList, new Comparator<File>() {
-            @Override
-            public int compare(File file1, File file2) {
-                if (file1.isDirectory() && file2.isDirectory() || file1.isFile() && file2.isFile()) {
-                    return file1.compareTo(file2);
-                } else {
-                    //文件夹显示在文件之前；
-                    return file1.isDirectory() ? -1 : 1;
-                }
-            }
-        });
+        switch (SORT_BY) {
+            case SORT_BY_NAME:
+                Collections.sort(fileList, new Comparator<File>() {
+                    @Override
+                    public int compare(File file1, File file2) {
+                        if (file1.isDirectory() && file2.isDirectory() || file1.isFile() && file2.isFile()) {
+                            return file1.compareTo(file2);
+                        } else {
+                            //文件夹显示在文件之前；
+                            return SORT_ORDER * (file1.isDirectory() ? -1 : 1);
+                        }
+                    }
+                });
+                break;
+            case SORT_BY_TIME:
+                Collections.sort(fileList, new Comparator<File>() {
+                    @Override
+                    public int compare(File file1, File file2) {
+                        if (file1.isDirectory() && file2.isDirectory() || file1.isFile() && file2.isFile()) {
+                            return (int) (file1.lastModified() - file2.lastModified());
+                        } else {
+                            //文件夹显示在文件之前；
+                            return SORT_ORDER * (file1.isDirectory() ? -1 : 1);
+                        }
+                    }
+                });
+                break;
+            default:
+        }
     }
 
     /**
@@ -212,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         switch (MODE) {
-            case MODE_NORMAL:
+            case NORMAL_MODE:
                 switch (keyCode) {
                     case KeyEvent.KEYCODE_BACK:
                         if (currentPath.equals(rootPath)) {
@@ -234,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
                 break;
-            case MODE_MULTISELECT:
+            case MULTI_SELECT_MODE:
                 exitMultiSelectMode();
                 return true;
             default:
