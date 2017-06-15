@@ -10,9 +10,19 @@
         android:title="按时间排序"/>
 
     <item
+        android:id="@+id/show_hide_files"
+        android:title="显示隐藏文件"
+        android:checkable="true"
+        android:checked="false"/>
+
+
+    <item
+        android:id="@+id/root_path"
+        android:title="根目录"/>
+
+    <item
         android:id="@+id/qq_download"
         android:title="QQ下载文件"/>
-
     <item
         android:id="@+id/tim_download"
         android:title="TIM下载文件"/>

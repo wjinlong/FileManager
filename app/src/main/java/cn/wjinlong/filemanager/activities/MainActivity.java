@@ -42,12 +42,13 @@ public class MainActivity extends AppCompatActivity {
 
     public static final int SORT_BY_NAME = 0;
     public static final int SORT_BY_TIME = 1;
-    private static int SORT_BY = SORT_BY_TIME;
+    private static int SORT_BY = SORT_BY_NAME;
 
     public static final int ORDER = 1;
     public static final int REVERSE_ORDER = -1;
-    private static int SORT_ORDER = REVERSE_ORDER;
+    private static int SORT_ORDER = ORDER;
 
+    public static boolean SHOW_HIDE_FILES = false;
 
     ListView listView;
     List<File> fileList;//文件列表
@@ -133,11 +134,23 @@ public class MainActivity extends AppCompatActivity {
                 SORT_ORDER = REVERSE_ORDER;
                 refreshFileList();
                 return true;
+
+            case R.id.root_path:
+                if (!rootPath.equals(Environment.getExternalStorageDirectory().getPath())) {
+                    rootPath = Environment.getExternalStorageDirectory().getPath();
+                    currentPath = rootPath;
+                    SORT_BY = SORT_BY_NAME;
+                    SORT_ORDER = ORDER;
+                    refreshFileList();
+                }
+                return true;
             case R.id.qq_download:
                 File QQfile = new File(QQfile_recv);
                 if (QQfile.exists()){
                     rootPath = QQfile.getPath();
                     currentPath = QQfile.getPath();
+                    SORT_BY = SORT_BY_TIME;
+                    SORT_ORDER = REVERSE_ORDER;
                     refreshFileList();
                 }else {
                     Toast.makeText(MainActivity.this, "您可能没有安装QQ", Toast.LENGTH_SHORT).show();
@@ -149,10 +162,27 @@ public class MainActivity extends AppCompatActivity {
                 if (TIMfile.exists()) {
                     rootPath = TIMfile.getPath();
                     currentPath = TIMfile.getPath();
+                    SORT_BY = SORT_BY_TIME;
+                    SORT_ORDER = REVERSE_ORDER;
                     refreshFileList();
                 } else {
                     Toast.makeText(MainActivity.this, "您可能没有安装TIM", Toast.LENGTH_SHORT).show();
                 }
+                return true;
+            case R.id.show_hide_files:
+
+                Log.d("status Before: ", String.valueOf(item.isChecked()));
+                boolean beforeStatus = item.isChecked();
+                if (beforeStatus) {
+                    item.setChecked(false);
+                } else {
+                    item.setChecked(true);
+                }
+
+                Log.d("status: After: ", String.valueOf(item.isChecked()));
+                SHOW_HIDE_FILES = item.isChecked();
+                Log.d("show_hide_files status", String.valueOf(SHOW_HIDE_FILES));
+                refreshFileList();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -531,6 +561,8 @@ public class MainActivity extends AppCompatActivity {
             });
 
             renameDialog.show();//要在setButton之后，不然没有按钮。
+        } else {
+            Toast.makeText(MainActivity.this, "抱歉，目前只能重命名单个文件",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -541,11 +573,14 @@ public class MainActivity extends AppCompatActivity {
             File file = checkedFiles.get(0);
             if (file.isFile()) {
                 Uri path = Uri.fromFile(file);
-                Intent intent = new Intent(Intent.ACTION_SEND);
+                Intent intent = new Intent(Intent.ACTION_DEFAULT);
                 intent.setDataAndType(path, "*/*");
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
                 startActivity(intent);
+                exitMultiSelectMode();
             }
+        }else {
+            Toast.makeText(MainActivity.this, "抱歉，目前只能分享单个文件",Toast.LENGTH_SHORT).show();
         }
     }
 

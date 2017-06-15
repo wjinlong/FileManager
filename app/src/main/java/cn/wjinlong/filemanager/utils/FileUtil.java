@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cn.wjinlong.filemanager.activities.MainActivity;
+
 /**
  * Created by King on 2017/5/27 0027.
  */
@@ -105,9 +107,12 @@ public class FileUtil {
 
         if (file.exists() && file.isDirectory()){
             String[] files = file.list();
+            boolean startWithPoint = false;
+
             for (String i : files) {
                 File tmp = new File(path+File.separator+i);
-                if (tmp.exists()){
+                startWithPoint = tmp.getName().charAt(0) == '.';
+                if (tmp.exists() && MainActivity.SHOW_HIDE_FILES || !startWithPoint){
                     fileList.add(tmp);
                 }
             }
