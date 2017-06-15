@@ -210,6 +210,7 @@ public class FileAdapter extends BaseAdapter {
 
         HashSet<String> sheetExtension = new HashSet<>();
         sheetExtension.add("xls");
+        sheetExtension.add("xlsx");
 
         HashSet<String> textExtension = new HashSet<>();
         textExtension.add("txt");

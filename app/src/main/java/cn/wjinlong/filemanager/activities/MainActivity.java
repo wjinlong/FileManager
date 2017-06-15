@@ -1,5 +1,6 @@
 package cn.wjinlong.filemanager.activities;
 
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -53,8 +54,11 @@ public class MainActivity extends AppCompatActivity {
     String rootPath = Environment.getExternalStorageDirectory().getPath();//根目录
     String currentPath = rootPath;
 
+    //移动或复制的路径
     String toPath;
 
+    public static final String QQfile_recv = Environment.getExternalStorageDirectory().getPath() + File.separator + "Tencent" + File.separator + "QQfile_recv";
+    public static final String TIMfile_recv = Environment.getExternalStorageDirectory().getPath() + File.separator + "Tencent" + File.separator + "TIMfile_recv";
 
     List<File> checkedFiles = new ArrayList<>();//选中的文件列表
     FileAdapter fileAdapter;//文件适配器
@@ -66,6 +70,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+//        File QQfile = new File(QQfile_recv);
+//        File TIMfile = new File(TIMfile_recv);
+//
+//        if (QQfile.exists()){
+//            rootPath = QQfile.getPath();
+//            currentPath = QQfile.getPath();
+//        }else if (TIMfile.exists()){
+//            rootPath = TIMfile.getPath();
+//            currentPath = TIMfile.getPath();
+//        }
 
         listView = (ListView) findViewById(R.id.list_item);
 
@@ -100,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.sort_options,menu);
+        inflater.inflate(R.menu.options,menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -116,6 +132,27 @@ public class MainActivity extends AppCompatActivity {
                 SORT_BY = SORT_BY_TIME;
                 SORT_ORDER = REVERSE_ORDER;
                 refreshFileList();
+                return true;
+            case R.id.qq_download:
+                File QQfile = new File(QQfile_recv);
+                if (QQfile.exists()){
+                    rootPath = QQfile.getPath();
+                    currentPath = QQfile.getPath();
+                    refreshFileList();
+                }else {
+                    Toast.makeText(MainActivity.this, "您可能没有安装QQ", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            case R.id.tim_download:
+                File TIMfile = new File(TIMfile_recv);
+
+                if (TIMfile.exists()) {
+                    rootPath = TIMfile.getPath();
+                    currentPath = TIMfile.getPath();
+                    refreshFileList();
+                } else {
+                    Toast.makeText(MainActivity.this, "您可能没有安装TIM", Toast.LENGTH_SHORT).show();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -202,13 +239,21 @@ public class MainActivity extends AppCompatActivity {
                 refreshFileList();//刷新文件列表
             } else {//如果是普通文件
                 //Toast.makeText(MainActivity.this, "打开"+file.getName(), Toast.LENGTH_SHORT).show();
-                Uri path = Uri.fromFile(file);
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                FileUtil fileUtil = new FileUtil(currentPath);
-                intent.setDataAndType(path, fileUtil.getMIMEType());
+                try {
 
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                    Uri path = Uri.fromFile(file);
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.addCategory("android.intent.category.DEFAULT");
+
+                    FileUtil fileUtil = new FileUtil(file.getPath());
+                    intent.setDataAndType(path, fileUtil.getMIMEType());
+                    Log.d("MIME", "extension: " + fileUtil.getExtension());
+                    Log.d("MIME", "type: " + fileUtil.getMIMEType());
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }catch (ActivityNotFoundException e){
+                    Toast.makeText(MainActivity.this,"打开失败，你可能未安装可以打开该类型文件的应用",Toast.LENGTH_LONG).show();
+                }
             }
         } else {//如果文件不存在
             Toast.makeText(MainActivity.this, "文件夹或文件不存在或已被删除", Toast.LENGTH_SHORT).show();
@@ -246,10 +291,10 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public int compare(File file1, File file2) {
                         if (file1.isDirectory() && file2.isDirectory() || file1.isFile() && file2.isFile()) {
-                            return file1.compareTo(file2);
+                            return SORT_ORDER *file1.compareTo(file2);
                         } else {
                             //文件夹显示在文件之前；
-                            return SORT_ORDER * (file1.isDirectory() ? -1 : 1);
+                            return file1.isDirectory() ? -1 : 1;
                         }
                     }
                 });
@@ -259,10 +304,10 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public int compare(File file1, File file2) {
                         if (file1.isDirectory() && file2.isDirectory() || file1.isFile() && file2.isFile()) {
-                            return (int) (file1.lastModified() - file2.lastModified());
+                            return SORT_ORDER * (file1.lastModified() > file2.lastModified() ? 1 : -1);
                         } else {
                             //文件夹显示在文件之前；
-                            return SORT_ORDER * (file1.isDirectory() ? -1 : 1);
+                            return file1.isDirectory() ? -1 : 1;
                         }
                     }
                 });
@@ -462,9 +507,11 @@ public class MainActivity extends AppCompatActivity {
 //                    Log.d("path", "old file parent"+oldFile.getParent());
 //                    Log.d("path", "new path"+newPath);
 
-                    File newFile = new File(newPath);
+                    File newName = new File(newPath);
 
-                    boolean renameResult = oldFile.renameTo(newFile);
+                    boolean renameResult = oldFile.renameTo(newName);
+                    oldFile.setLastModified(System.currentTimeMillis());
+
                     if (renameResult) {
                         Toast.makeText(MainActivity.this, "重命名成功", Toast.LENGTH_SHORT).show();
                     } else {

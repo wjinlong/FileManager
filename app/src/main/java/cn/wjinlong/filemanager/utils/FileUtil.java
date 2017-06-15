@@ -150,7 +150,7 @@ public class FileUtil {
         if (extension.equals("")){
             return type;
         }
-
+        extension = "." + extension;
         //在MIME和文件类型的匹配表中找到对应的MIME类型。
         for(int i=0;i<MIME_MapTable.length;i++){
             if(extension.toLowerCase().equals(MIME_MapTable[i][0]))

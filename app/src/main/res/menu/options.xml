@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/sort_by_name"
+        android:title="按名称排序"/>
+    <item
+        android:id="@+id/sort_by_time"
+        android:title="按时间排序"/>
+
+    <item
+        android:id="@+id/qq_download"
+        android:title="QQ下载文件"/>
+
+    <item
+        android:id="@+id/tim_download"
+        android:title="TIM下载文件"/>
+</menu>
