@@ -107,8 +107,7 @@ public class FileUtil {
 
         if (file.exists() && file.isDirectory()){
             String[] files = file.list();
-            boolean startWithPoint = false;
-
+            boolean startWithPoint;
             for (String i : files) {
                 File tmp = new File(path+File.separator+i);
                 startWithPoint = tmp.getName().charAt(0) == '.';
@@ -125,9 +124,11 @@ public class FileUtil {
         fileList = new ArrayList<>();
         if (file.exists() && file.isDirectory()){
             String[] files = file.list();
+            boolean startWithPoint;
             for (String i : files) {
                 File tmp = new File(path+File.separator+i);
-                if (tmp.exists()&& tmp.isDirectory()){
+                startWithPoint = tmp.getName().charAt(0) == '.';
+                if (tmp.exists() && tmp.isDirectory() && MainActivity.SHOW_HIDE_FILES || !startWithPoint) {
                     fileList.add(tmp);
                 }
             }
